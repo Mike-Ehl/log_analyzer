@@ -1,5 +1,6 @@
 import logging
 import json
+from datetime import datetime
 
 json_file = "json_file.json"
 
@@ -13,6 +14,41 @@ def read_json_file():
         logger.error(f"File nowt found error: {e}")
 
 
+#First we define the classes:
+#Defining a JSON formatter which inherits from the logging.Formatter class
+class JSONFormatter(logging.Formatter):
+    def __init__(self):
+        super().__init__()
+
+    #record is defined in the parent class and is where we get out data from
+    def format(self, record):
+        now = datetime.now()
+        log_record = {
+            "time": now.isoformat(),
+            "level": record.levelname,
+            "msg": record.getMessage(),
+        }
+        return json.dumps(log_record)
+
+
+#Creating a LogParser class to parse logs
+class LogParser():
+        
+    def __init__(self, log_file):
+        print("Initializing Log Parser")
+        self.log_file = log_file
+        self.log_data = self.return_logs()
+        print(f"{self.log_data}, {log_file}")
+    
+    def return_logs(self):
+        logs = []
+        with open(self.log_file, "r") as file:
+            line = file.readline()
+            while line:
+                log = json.loads(line)
+                logs.append(log)
+        return logs
+
 
 #Create the logger
 logger = logging.getLogger("MyLogger")
@@ -20,7 +56,7 @@ logger.setLevel(logging.INFO)
 
 #Adding Handler and Formatter
 handler = logging.FileHandler("test.log")
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+formatter = logging.Formatter(JSONFormatter())
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -34,27 +70,14 @@ def test_logger_levels():
     logger.critical("Critical level log")
 
 
-#Creating a class to parse logs
-class Parser():
-        
-    def __init__(self, log_file):
-        self.log_file = log_file
-        self.log_data = self.return_logs()
-        print(f"{self.log_data}, {log_file}")
-    
-    def return_logs(self):
-        logs = []
-        with open(self.log_file, "r") as file:
-            line = file.readline()
-            while line:
-                log = json.loads(line)
-                for info in log.keys():
-                    print(info, log.keys)
+
 
 log_file = "test.log"
 
+
 def main():
-    my_parser = Parser(log_file)
+    my_parser = LogParser(log_file)
+    test_logger_levels()
     my_parser.return_logs()
 
 

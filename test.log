@@ -1,1 +1,9 @@
 2026-03-05 13:46:36,250 - MyLogger - INFO - Testing the logger
+2026-03-05 20:47:02,427 - MyLogger - INFO - Info level log
+2026-03-05 20:47:02,427 - MyLogger - WARNING - Warning level log
+2026-03-05 20:47:02,427 - MyLogger - ERROR - Error level log
+2026-03-05 20:47:02,427 - MyLogger - CRITICAL - Critical level log
+2026-03-05 20:47:24,017 - MyLogger - INFO - Info level log
+2026-03-05 20:47:24,017 - MyLogger - WARNING - Warning level log
+2026-03-05 20:47:24,017 - MyLogger - ERROR - Error level log
+2026-03-05 20:47:24,017 - MyLogger - CRITICAL - Critical level log
