@@ -3,8 +3,6 @@ import json
 from datetime import datetime
 
 
-
-#First we define the classes:
 #Defining a JSON formatter which inherits from the logging.Formatter class
 class JSONFormatter(logging.Formatter):
     def __init__(self):
@@ -22,9 +20,7 @@ class JSONFormatter(logging.Formatter):
         print(type(obj))
         return obj
 
-
-#Creating a LogParser class to parse logs
-class LogParser():
+class JSONParser():
         
     def __init__(self, log_file):
         self.log_file = log_file
@@ -39,13 +35,14 @@ class LogParser():
                 print(f"{line} was added to ''logs")
         return logs
 
+log_file = "test.log"
 
 #Create the logger
 logger = logging.getLogger("MyLogger")
 logger.setLevel(logging.INFO)
 
 #Adding Handler and Formatter
-handler = logging.FileHandler("test.log")
+handler = logging.FileHandler(log_file)
 formatter = JSONFormatter()
 handler.setFormatter(formatter)
 logger.addHandler(handler)
@@ -59,10 +56,9 @@ def test_logger_levels():
     logger.error("Error level log")
     logger.critical("Critical level log")
 
-log_file = "test.log"
 
 def main():
-    my_parser = LogParser(log_file)
+    my_parser = JSONParser(log_file)
     test_logger_levels()
     my_parser.return_logs()
 
