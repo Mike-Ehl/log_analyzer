@@ -1,52 +1,51 @@
 import logging
 import json
+import re
 from datetime import datetime
 
 
-
 #First we define the classes:
-#Defining a JSON formatter which inherits from the logging.Formatter class
-class JSONFormatter(logging.Formatter):
-    def __init__(self):
-        super().__init__()
-
-    #record is defined in the parent class and is where we get out data from
-    def format(self, record):
-        now = datetime.now()
-        log_record = [{
-            "time": now.isoformat(),
-            "level": record.levelname,
-            "msg": record.getMessage(),
-        }]
-        obj =  json.dumps(log_record, ensure_ascii=False)
-        print(type(obj))
-        return obj
-
-
 #Creating a LogParser class to parse logs
 class LogParser():
-        
+
     def __init__(self, log_file):
         self.log_file = log_file
         self.log_data = self.return_logs()
     
     def return_logs(self):
-        print("in return logs function")
         logs = []
-        with open(self.log_file, "r") as file:
-            for line in file.readlines():
-                logs.append(line)
-                print(f"{line} was added to ''logs")
+        with open(self.log_file, "r", encoding="utf-8", errors="replace") as file:
+            for line in file:
+                line = re.split("--", line.strip())
+                dict = {
+                    "timestamp":line[0],
+                    "name": line[1],
+                    "level": line[2],
+                    "message": line[3]
+                }
+                logs.append(dict)
+                
         return logs
+    
+    def parse_by_message(self, message):
+        matches = [] 
+        for entry in self.log_data:
+            if message in entry["message"]:
+                matches.append(entry)
+        print(f"""Entries including: "{message}" """)
+        for entry in matches:
+            print(entry)
 
+
+log_file = "test.log"
 
 #Create the logger
 logger = logging.getLogger("MyLogger")
 logger.setLevel(logging.INFO)
 
 #Adding Handler and Formatter
-handler = logging.FileHandler("test.log")
-formatter = JSONFormatter()
+handler = logging.FileHandler(log_file)
+formatter = logging.Formatter("%(asctime)s -- %(name)s -- %(levelname)s -- %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -59,12 +58,17 @@ def test_logger_levels():
     logger.error("Error level log")
     logger.critical("Critical level log")
 
-log_file = "test.log"
+
 
 def main():
-    my_parser = LogParser(log_file)
+
+    #Cleaning the log file before each test
+    with open(log_file, 'w') as f:
+        f.write("")
     test_logger_levels()
-    my_parser.return_logs()
+
+    my_parser = LogParser(log_file)
+    my_parser.parse_by_message("Critical")
 
 
 if __name__ == '__main__':
