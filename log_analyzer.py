@@ -14,7 +14,8 @@ class LogParser():
         self.log_file = log_file
         self.log_data = self.return_logs()
     
-    def return_logs(self):
+    #Returns the log data in a dictionary for easier handling
+    def return_logs(self) -> dict:
         logs = []
         with open(self.log_file, "r", encoding="utf-8", errors="replace") as file:
             for line in file:
@@ -33,14 +34,23 @@ class LogParser():
                 
         return logs
     
+    #Turns a dict entry to a log
+    def dict_to_log(self, entry:dict) ->str:
+        log = entry["timestamp"] + entry["name"] + entry["level"] + entry["message"]
+        return log
+    
+
+    #Parses the entries by message
     def parse_by_message(self, message):
         matches = [] 
         for entry in self.log_data:
             if message in entry["message"]:
-                matches.append(entry)
+                log = self.dict_to_log(entry)
+                matches.append(log)
+
         print(f"""Entries including: "{message}" """)
-        for entry in matches:
-            print(entry)
+        for log in matches:
+            print(log)
 
 
 log_file = "test.log"
