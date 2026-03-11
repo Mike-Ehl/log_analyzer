@@ -6,6 +6,8 @@ from datetime import datetime
 
 #First we define the classes:
 #Creating a LogParser class to parse logs
+
+
 class LogParser():
 
     def __init__(self, log_file):
@@ -17,11 +19,15 @@ class LogParser():
         with open(self.log_file, "r", encoding="utf-8", errors="replace") as file:
             for line in file:
                 line = re.split("--", line.strip())
+
+                message = ""
+                for string in line[3:]:
+                    message += string
                 dict = {
                     "timestamp":line[0],
                     "name": line[1],
                     "level": line[2],
-                    "message": line[3]
+                    "message": message
                 }
                 logs.append(dict)
                 
@@ -50,13 +56,14 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
+
 #Function to test logger on all levels
 def test_logger_levels():
     logger.info("Info level log")
     logger.debug("Debug level log")
     logger.warning("Warning level log")
     logger.error("Error level log")
-    logger.critical("Critical level log")
+    logger.critical("Critical level log -- to test hyphens")
 
 
 
