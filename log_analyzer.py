@@ -48,7 +48,7 @@ class LogParser():
     def parse_by_message(self, message):
         matches = [] 
         for entry in self.log_data:
-            if message in entry["message"]:
+            if message.lower() in entry["message"].lower():
                 log = self.dict_to_log(entry)
                 matches.append(log)
         if matches:
@@ -86,7 +86,7 @@ class LogParser():
     def parse_by_level(self, level):
         matches = []
         for entry in self.log_data:
-            if entry["level"] == level:
+            if entry["level"] == level.upper():
                 log = self.dict_to_log(entry)
                 matches.append(log)
         if matches:
@@ -118,7 +118,7 @@ def test_logger_levels():
     logger.debug("Debug level log")
     logger.warning("Warning level log")
     logger.error("Error level log")
-    logger.error("Error level log with Critical in text")
+    logger.error("Error level log with critical lowecase in text")
     logger.critical("Critical level log -- to test hyphens")
 
 
@@ -129,11 +129,8 @@ def main():
     with open(log_file, 'w') as f:
         f.write("")
     test_logger_levels()
-
     my_parser = LogParser(log_file)
-    my_parser.parse_by_message("Criticals")
-    my_parser.parse_by_logger("MyLoggr")
-    my_parser.parse_by_level("ERROR")
+    my_parser.parse_by_level("error")
 
 
 if __name__ == '__main__':
