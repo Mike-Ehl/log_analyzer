@@ -51,19 +51,37 @@ class LogParser():
             if message in entry["message"]:
                 log = self.dict_to_log(entry)
                 matches.append(log)
-
-        print(f"""Entries including: "{message}" """)
-        for log in matches:
-            print(log)
+        if matches:
+            print(f"""Log entries including: "{message}": 
+                """)
+            for log in matches:
+                print(log)
+        else:
+            print(f"""No entries were found including the message:
+"{message}" 
+""")
 
     #Parses entries by time
     def parse_by_time(self, time):
         pass
 
     #Parses entries by logger
-    def parse_by_logger(self, logger):
-        pass
+    def parse_by_logger(self, logger_name):
+        matches = []
+        for entry in self.log_data:
+            if entry["name"] == logger_name:
+                log = self.dict_to_log(entry)
+                matches.append(log)
+        if matches:
+            print(f"""Log entries from: "{logger_name}" Logger:
+                """)
+            for match in matches:
+                print(match)
+        else:
+            print(f"""No entries were found from "{logger_name}" Logger.
+                  """)
     
+
     #Parses entries by level
     def parse_by_level(self, level):
         matches = []
@@ -71,10 +89,13 @@ class LogParser():
             if entry["level"] == level:
                 log = self.dict_to_log(entry)
                 matches.append(log)
-
-        print(f"{level} Level matches:")
-        for match in matches:
-            print(match)
+        if matches:
+            print(f"""Log entries from "{level}"" Level :
+                """)
+            for match in matches:
+                print(match)
+        else:
+            print(f"No entries were found with Level {level}")
 
 
 log_file = "test.log"
@@ -110,6 +131,8 @@ def main():
     test_logger_levels()
 
     my_parser = LogParser(log_file)
+    my_parser.parse_by_message("Criticals")
+    my_parser.parse_by_logger("MyLoggr")
     my_parser.parse_by_level("ERROR")
 
 
