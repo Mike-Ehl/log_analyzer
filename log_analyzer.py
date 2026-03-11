@@ -25,18 +25,22 @@ class LogParser():
                 for string in line[3:]:
                     message += string
                 dict = {
-                    "timestamp":line[0],
-                    "name": line[1],
-                    "level": line[2],
+                    "timestamp":line[0].strip(),
+                    "name": line[1].strip(),
+                    "level": line[2].strip(),
                     "message": message
                 }
                 logs.append(dict)
                 
         return logs
     
-    #Turns a dict entry to a log
+    #Turns a dict entry to a log (string)
     def dict_to_log(self, entry:dict) ->str:
-        log = entry["timestamp"] + entry["name"] + entry["level"] + entry["message"]
+        timestamp = entry["timestamp"]
+        name = entry["name"]
+        level = entry["level"]
+        message = entry["message"]
+        log = f"{timestamp} -- {name} -- {level} -- {message}"
         return log
     
 
@@ -51,6 +55,26 @@ class LogParser():
         print(f"""Entries including: "{message}" """)
         for log in matches:
             print(log)
+
+    #Parses entries by time
+    def parse_by_time(self, time):
+        pass
+
+    #Parses entries by logger
+    def parse_by_logger(self, logger):
+        pass
+    
+    #Parses entries by level
+    def parse_by_level(self, level):
+        matches = []
+        for entry in self.log_data:
+            if entry["level"] == level:
+                log = self.dict_to_log(entry)
+                matches.append(log)
+
+        print(f"{level} Level matches:")
+        for match in matches:
+            print(match)
 
 
 log_file = "test.log"
@@ -73,6 +97,7 @@ def test_logger_levels():
     logger.debug("Debug level log")
     logger.warning("Warning level log")
     logger.error("Error level log")
+    logger.error("Error level log with Critical in text")
     logger.critical("Critical level log -- to test hyphens")
 
 
@@ -85,7 +110,7 @@ def main():
     test_logger_levels()
 
     my_parser = LogParser(log_file)
-    my_parser.parse_by_message("Critical")
+    my_parser.parse_by_level("ERROR")
 
 
 if __name__ == '__main__':
