@@ -2,6 +2,7 @@ import logging
 import json
 import re
 from datetime import datetime
+import os
 
 
 #First we define the classes:
@@ -61,9 +62,6 @@ class LogParser():
 "{message}" 
 """)
 
-    #Parses entries by time
-    def parse_by_time(self, time):
-        pass
 
     #Parses entries by logger
     def parse_by_logger(self, logger_name):
@@ -98,6 +96,78 @@ class LogParser():
             print(f"No entries were found with Level {level}")
 
 
+    #Parses entries by time
+    def parse_by_time(self):
+        matches = []
+
+        print("""Parse logs by time using specific date or time:
+Instructions:
+1- The program will take one or two values. If it receives just one it will return
+all logs that have that specific date or time. If it receives two it will return 
+all logs between those timestamps. 
+              
+2- To enter just one value press "Enter" when asked to enter the second value.
+              
+3- To show all logs from from before or after a specific date, enter the number "0" 
+as the other value:
+              
+Example 1:
+First value: 0 
+Second value: 2026/02/12
+Will return all logs before 2026/02/12
+              
+Example 1:
+First value: 2026/02/12
+Second value: 0
+Will return all logs after 2026/02/12
+
+The format will be:
+              
+"YYYY-MM-DD"  for the date
+"H:M:S,-03-11F"     for the hour
+              
+              
+""")
+        print("""Enter the first value""")
+        date1 = input("Date: ")
+        if date1 == "":
+            clear_screen()
+            print("""No data was entered
+...
+Exiting the program>>>""")
+            return 0
+
+        time1 = input("Time: ")
+        timestamp1_str = f"{date1} {time1}"
+        log1_time = datetime.strptime(timestamp1_str, "%Y-%m-%d %H:%M:%S,%f")
+
+
+        print("""Enter the second value or press enter to return logs matching value 1""")
+        date2 = input("Date: ")
+        if date2 == "":
+            for entry in self.log_data:
+                if datetime.strptime(entry["timestamp"], "%Y-%m-%d %H:%M:%S,%f") == log1_time:
+                    log = self.dict_to_log(entry)
+                    matches.append(log)
+            if matches:
+                print(f"""Log entries from "{timestamp1_str}":
+                    """)
+                for match in matches:
+                    print(match)
+            else:
+                print(f"No entries were found with {timestamp1_str} Timestamp")
+            return 0
+
+        time2 = input("Time: ")
+
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def check_datetimne_format(string):
+    pass
+
+
 log_file = "test.log"
 
 #Create the logger
@@ -130,7 +200,7 @@ def main():
         f.write("")
     test_logger_levels()
     my_parser = LogParser(log_file)
-    my_parser.parse_by_level("error")
+    my_parser.parse_by_time()
 
 
 if __name__ == '__main__':

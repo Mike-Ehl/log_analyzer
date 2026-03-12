@@ -1,4 +1,5 @@
-2026-03-11 15:54:38,307 -- MyLogger -- INFO -- Info level log
-2026-03-11 15:54:38,307 -- MyLogger -- WARNING -- Warning level log
-2026-03-11 15:54:38,307 -- MyLogger -- ERROR -- Error level log
-2026-03-11 15:54:38,307 -- MyLogger -- CRITICAL -- Critical level log -- to test hyphens
+2026-03-11 19:28:38,973 -- MyLogger -- INFO -- Info level log
+2026-03-11 19:28:38,973 -- MyLogger -- WARNING -- Warning level log
+2026-03-11 19:28:38,973 -- MyLogger -- ERROR -- Error level log
+2026-03-11 19:28:38,973 -- MyLogger -- ERROR -- Error level log with critical lowecase in text
+2026-03-11 19:28:38,973 -- MyLogger -- CRITICAL -- Critical level log -- to test hyphens
