@@ -44,6 +44,31 @@ class LogParser():
         log = f"{timestamp} -- {name} -- {level} -- {message}"
         return log
     
+    def enter_time_data(self):
+        string_is_valid = False
+        while not string_is_valid:
+            print("""Enter the date using the following format: YYYY:MM:DD""")
+            date1 = input("\nDate: ")
+            if date1 == "":
+                clear_screen()
+                print("""No data was entered\n...\nExiting the program>>>""")
+                return 0
+
+            time = input("Time: ")
+
+            if not time:
+                time = "0:0:0,0"
+            timestamp_str = f"{date1} {time}"
+
+            try:
+                log_time = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S,%f")
+                string_is_valid = True
+                return log_time
+            
+            except ValueError:
+                    clear_screen()
+                    print("The format you entered is not valid.\nThe correct format is:\n\nDate: YYYY-MM-DD\nTime: HH:MM:SS,FF\n")
+    
 
     #Parses the entries by message
     def parse_by_message(self, message):
@@ -96,69 +121,72 @@ class LogParser():
             print(f"No entries were found with Level {level}")
 
 
+
     #Parses entries by time
     def parse_by_time(self):
         matches = []
-
+        clear_screen()
         print("""Parse logs by time using specific date or time:
-Instructions:
-1- The program will take one or two values. If it receives just one it will return
-all logs that have that specific date or time. If it receives two it will return 
-all logs between those timestamps. 
-              
-2- To enter just one value press "Enter" when asked to enter the second value.
-              
-3- To show all logs from from before or after a specific date, enter the number "0" 
-as the other value:
-              
-Example 1:
-First value: 0 
-Second value: 2026/02/12
-Will return all logs before 2026/02/12
-              
-Example 1:
-First value: 2026/02/12
-Second value: 0
-Will return all logs after 2026/02/12
+Options:
+
+1- Show logs from an specific timestamp:
+2- Show logs before or after a certain timestamp
+3- Show logs between two timestamps
 
 The format will be:
               
-"YYYY-MM-DD"  for the date
-"H:M:S,-03-11F"     for the hour
+"YYYY-MM-DD"--->for the Date
+"H:M:S,F"------>for the Time
               
-              
-""")
-        print("""Enter the first value""")
-        date1 = input("Date: ")
-        if date1 == "":
-            clear_screen()
-            print("""No data was entered
-...
-Exiting the program>>>""")
-            return 0
+""")    
+        
+        option = 0
+        while not option:
+            try:
+                option = int(input("Choose one option: "))
+                if option > 3 or option < 1:
+                    option = 0
+                    raise SyntaxError
+            except:
+                clear_screen()
+                print("""Choose one number between 1 and 3 for the following options:
+                      
+1- Show logs from an specific timestamp:
+2- Show logs before or after a certain timestamp
+3- Show logs between two timestamps""")
+                option = 0
 
-        time1 = input("Time: ")
-        timestamp1_str = f"{date1} {time1}"
-        log1_time = datetime.strptime(timestamp1_str, "%Y-%m-%d %H:%M:%S,%f")
+        #Matches logs with specific timestamp
+        if option == 1:
+            timestamp = self.enter_time_data()
 
-
-        print("""Enter the second value or press enter to return logs matching value 1""")
-        date2 = input("Date: ")
-        if date2 == "":
             for entry in self.log_data:
-                if datetime.strptime(entry["timestamp"], "%Y-%m-%d %H:%M:%S,%f") == log1_time:
-                    log = self.dict_to_log(entry)
-                    matches.append(log)
-            if matches:
-                print(f"""Log entries from "{timestamp1_str}":
-                    """)
-                for match in matches:
-                    print(match)
-            else:
-                print(f"No entries were found with {timestamp1_str} Timestamp")
-            return 0
+                entry_time = datetime.strptime(entry["timestamp"], "%Y-%m-%d %H:%M:%S,%f")
+                if entry_time == timestamp:
+                    matches.append(entry)
+            print(f"""Logs with timestamp {timestamp}:\n""")
+        
+        #Matches logs after or before the entered timestamp
+        if option == 2:
+            pass
 
-        time2 = input("Time: ")
+        #Matches logs between two timestamps
+        if option == 3:
+            pass
+
+
+
+
+
+
+        if matches:
+            for match in matches:
+                match = self.dict_to_log(match)
+                print(match)
+        else:
+            clear_screen()
+            print("No logs matched your search.")
+
 
 
 def clear_screen():
