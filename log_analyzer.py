@@ -3,7 +3,7 @@ import json
 import re
 from datetime import datetime
 import os
-
+from time import sleep
 
 #First we define the classes:
 #Creating a LogParser class to parse logs
@@ -14,6 +14,7 @@ class LogParser():
     def __init__(self, log_file):
         self.log_file = log_file
         self.log_data = self.return_logs()
+
     
     #Returns the log data in a dictionary for easier handling
     def return_logs(self) -> dict:
@@ -26,7 +27,7 @@ class LogParser():
                 for string in line[3:]:
                     message += string
                 dict = {
-                    "timestamp":line[0].strip(),
+                    "timestamp":datetime.strptime(line[0].strip(), "%Y-%m-%d %H:%M:%S,%f"),
                     "name": line[1].strip(),
                     "level": line[2].strip(),
                     "message": message
@@ -35,6 +36,7 @@ class LogParser():
                 
         return logs
     
+
     #Turns a dict entry to a log (string)
     def dict_to_log(self, entry:dict) ->str:
         timestamp = entry["timestamp"]
@@ -44,31 +46,53 @@ class LogParser():
         log = f"{timestamp} -- {name} -- {level} -- {message}"
         return log
     
+
+    #Handles entering the datetime data, validates and turns it into datetime <obj>
     def enter_time_data(self):
-        string_is_valid = False
-        while not string_is_valid:
-            print("""Enter the date using the following format: YYYY:MM:DD""")
-            date1 = input("\nDate: ")
-            if date1 == "":
-                clear_screen()
-                print("""No data was entered\n...\nExiting the program>>>""")
+        date_is_valid = False
+        while not date_is_valid:
+            print("""Enter the date using the following format: YYYY:MM:DD\nor\nPress"Enter" to exit""")
+            date_str = input("\nDate: ")
+            if date_str == "":
+                self.exit_animation()
                 return 0
-
-            time = input("Time: ")
-
-            if not time:
-                time = "0:0:0,0"
-            timestamp_str = f"{date1} {time}"
-
-            try:
-                log_time = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S,%f")
-                string_is_valid = True
-                return log_time
-            
-            except ValueError:
+            else:
+                try:
+                    date = datetime.strptime(date_str, "%Y-%m-%d")
+                    date_is_valid = True
+                except:
+                    print("""The date format is not valid, please try again\nor\nPress"Enter" to exit""")
+                    sleep(3)
                     clear_screen()
-                    print("The format you entered is not valid.\nThe correct format is:\n\nDate: YYYY-MM-DD\nTime: HH:MM:SS,FF\n")
+        
+        time_is_valid = False
+        while not time_is_valid:
+            print("""Enter the date using the following format: HH:MM:SS\nor\nPress"Enter" to exit""")
+            time_str = input("\nTime: ")
+            if time_str == "":
+                self.exit_animation()
+                return 0
+            else:
+                try:
+                    time = datetime.strptime(time_str, "%H:%M:%S")
+                    time_is_valid = True
+                except:
+                    print("The date format is not valid")
+                
+        timestamp_str = f"{date_str} {time_str}"
+
+        log_time = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+        return log_time
     
+
+    #Creates an animation that signals the porogram is closing
+    def exit_animation(self):
+        for i in range(1,4):
+            clear_screen()
+            set = ">"
+            print(f"""Exiting the program\n{set*i}""")
+            sleep(1)
+
 
     #Parses the entries by message
     def parse_by_message(self, message):
@@ -121,8 +145,7 @@ class LogParser():
             print(f"No entries were found with Level {level}")
 
 
-
-    #Parses entries by time
+    #Parses entries by date and time
     def parse_by_time(self):
         matches = []
         clear_screen()
@@ -136,10 +159,10 @@ Options:
 The format will be:
               
 "YYYY-MM-DD"--->for the Date
-"H:M:S,F"------>for the Time
+"H:M:S"------>for the Time
               
 """)    
-        
+        #Menu that lets the user choose how to parse by datetime
         option = 0
         while not option:
             try:
@@ -156,27 +179,73 @@ The format will be:
 3- Show logs between two timestamps""")
                 option = 0
 
+
         #Matches logs with specific timestamp
         if option == 1:
             timestamp = self.enter_time_data()
 
             for entry in self.log_data:
-                entry_time = datetime.strptime(entry["timestamp"], "%Y-%m-%d %H:%M:%S,%f")
+                entry_time = datetime.strptime(entry["timestamp"], "%Y-%m-%d %H:%M:%S")
                 if entry_time == timestamp:
                     matches.append(entry)
             print(f"""Logs with timestamp {timestamp}:\n""")
         
+
         #Matches logs after or before the entered timestamp
         if option == 2:
-            pass
+            clear_screen()
+            timestamp = self.enter_time_data()
+            if not timestamp:
+                return 0
+                
+            after_before = 0
+            while not after_before:
+                clear_screen()
+                try:
+                    after_before = int(input("Would you like to see entries before or after the timestamp you entered?\nChoose one option:\n\n1- Before\n2- After\n\n>>>"))
+                except:
+                    after_before = 0
+                if after_before < 0 or after_before > 2:
+                    after_before = 0
+
+            if after_before == 1:
+                after_before_str = "before"
+                for entry in self.log_data:
+                    entry_time = datetime.strptime(entry["timestamp"], "%Y-%m-%d %H:%M:%S")
+                    if entry_time < timestamp:
+                        matches.append(entry)
+
+            if after_before == 2:
+                after_before_str = "after"
+                for entry in self.log_data:
+                    entry_time = datetime.strptime(entry["timestamp"], "%Y-%m-%d %H:%M:%S")
+                    if entry_time > timestamp:
+                        matches.append(entry)
+
+            print(f"""Logs {after_before_str} {timestamp}:\n""")
+            
 
         #Matches logs between two timestamps
         if option == 3:
-            pass
+            clear_screen()
+            print("Enter the first timestamp")
+            timestamp1 = self.enter_time_data()
 
+            clear_screen()
+            print("Enter the second timestamp")
+            timestamp2 = self.enter_time_data()
+            
+            first_less_than_second = timestamp1 < timestamp2
 
-
-
+            if first_less_than_second:
+                for log in self.log_data:
+                    print(type(log["timestamp"]), type(timestamp1))
+                    if log["timestamp"] > timestamp1 and log["timestamp"] < timestamp2:
+                        matches.append(log)
+            else:
+                for log in self.log_data:
+                    if log["timestamp"] < timestamp1 and log["timestamp"] > timestamp2:
+                        matches.append(log)
 
 
         if matches:
@@ -191,9 +260,6 @@ The format will be:
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
-
-def check_datetimne_format(string):
-    pass
 
 
 log_file = "test.log"
@@ -218,7 +284,6 @@ def test_logger_levels():
     logger.error("Error level log")
     logger.error("Error level log with critical lowecase in text")
     logger.critical("Critical level log -- to test hyphens")
-
 
 
 def main():
