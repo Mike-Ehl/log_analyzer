@@ -261,6 +261,10 @@ The format will be:
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+def terminal_menu():
+    #This function will take care of the incteraction with the user and menu prompting
+    pass
+
 
 log_file = "test.log"
 
