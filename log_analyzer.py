@@ -9,6 +9,14 @@ from time import sleep
 #Creating a LogParser class to parse logs
 
 
+#Creates an animation that signals the porogram is closing
+def exit_animation(self):
+    for i in range(1,4):
+        clear_screen()
+        set = ">"
+        print(f"""Exiting the program\n{set*i}""")
+        sleep(1)
+
 class LogParser():
 
     def __init__(self, log_file):
@@ -48,7 +56,7 @@ class LogParser():
     
 
     #Handles entering the datetime data, validates and turns it into datetime <obj>
-    def enter_time_data(self):
+    def enter_time_data(self) -> datetime.date:
         date_is_valid = False
         while not date_is_valid:
             print("""Enter the date using the following format: YYYY:MM:DD\nor\nPress"Enter" to exit""")
@@ -263,7 +271,18 @@ def clear_screen():
 
 def terminal_menu():
     #This function will take care of the incteraction with the user and menu prompting
-    pass
+    print("""Use this menu to interacat with the script:
+
+Enter one of the following options using numbers (1-6):
+
+1- Get logs from log file
+2- Return log format
+3- Parse by message
+4- Parse by logger
+5- Parse by time
+6- Parse by level\
+          """)
+    input("Enter option number: ")
 
 
 log_file = "test.log"
